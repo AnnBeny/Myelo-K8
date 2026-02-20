@@ -1,0 +1,5 @@
+name: multiqc18
+channels: [conda-forge, bioconda, defaults]
+dependencies:
+  - multiqc=1.18
+

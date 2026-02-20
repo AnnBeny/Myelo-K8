@@ -1,0 +1,8 @@
+name: bedtools
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bedtools=2.24.0=0
+prefix: /home/kristina/miniconda3/envs/bedtools

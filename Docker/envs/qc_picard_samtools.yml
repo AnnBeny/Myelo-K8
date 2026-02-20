@@ -1,0 +1,6 @@
+name: qc_picard_samtools
+channels: [conda-forge, bioconda, defaults]
+dependencies:
+  - samtools=1.20
+  - picard=3.2.0
+  - openjdk=17
