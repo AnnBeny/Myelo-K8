@@ -412,6 +412,7 @@ workflow {
 	trimmedFQs = TRIMMING(umiFQs)
 	firstBAM = FIRST_ALIGN_BAM(trimmedFQs)
 	sortedBamBai = SORT_INDEX(firstBAM)
+	kontrolabam = FLAGSTAT(sortedBamBai)
 	dedupedBam = DEDUP(sortedBamBai)
 	QCs = BAMQC(dedupedBam)
 	ToMultiQC = QCs.map({return [it[1].run, it[2]]}).
