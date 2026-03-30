@@ -308,7 +308,6 @@ process BAMQC {
 	script:
 	"""
 	echo BAMQC $name
-    source activate qc_picard_samtools
 	samtools flagstat $bam > ${name}.flagstat
 	samtools stats $bam > ${name}.samstats
 	picard CollectHsMetrics I=$bam BAIT_INTERVALS=$params.ivl TARGET_INTERVALS=$params.ivl R=${params.ref}.fa O=${name}.hs_metrics
