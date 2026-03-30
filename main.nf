@@ -180,7 +180,6 @@ process NORMALIZE_MUTECT {
 	script:
 	"""
 	echo NORMALIZE_MUTECT $name
-    source activate bcftools117
 	bcftools norm -m-both $vcf_input > ${sample.name}.mutect.filt.norm.vcf
 	"""
 }
@@ -222,7 +221,6 @@ process FILTER_VCF {
 	script:
 	"""
 	echo FILTER_VCF $name
-    source activate bcftools117
 	bcftools view -f 'PASS,clustered_events,multiallelic' $vcf_input > ${sample.name}.mutect2.filt.norm.vep.filt.vcf
 	"""	
 }
