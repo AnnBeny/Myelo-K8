@@ -1,5 +1,1 @@
-#!/bin/bash
-# . activate nextflow
-
-#nextflow run /mnt/hdd2/anna/Myelo/src/project/annbeny/Myelo-Discovery -C nextflow.config -profile standard -resume -with-report
-nextflow -C /mnt/hdd2/anna/Myelo/src/nextflow.config run /mnt/hdd2/anna/Myelo/src/project/annbeny/Myelo-Discovery -profile high_mem -resume -with-report
+./nextflow-go kuberun Myelo-Discovery -r main -head-image 'cerit.io/nextflow/nextflow:25.10.2' -resume -with-report -c ./nextflow.config  --baseDir /cmbg/AvitiDN/

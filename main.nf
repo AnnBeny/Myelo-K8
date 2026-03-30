@@ -16,7 +16,7 @@ process UMI_extract {
 	script:
 	"""
 	echo UMI_extract $name
-	source /home/anna/miniconda3/bin/activate umi_tools
+	source activate umi_tools
 	umi_tools extract -I ${fwd} --bc-pattern=NNNNNNNN --read2-in=${rev} --stdout=${name}.umi.R1.fastq.gz --read2-out=${name}.umi.R2.fastq.gz || \
 	umi_tools extract --ignore-read-pair-suffixes -I ${fwd} --bc-pattern=NNNNNNNN --read2-in=${rev} --stdout=${name}.umi.R1.fastq.gz --read2-out=${name}.umi.R2.fastq.gz
 	"""
@@ -38,7 +38,7 @@ process TRIMMING {
 	script:
 	"""
 	echo TRIMMING $name
-	source /home/anna/miniconda3/bin/activate cutadapt
+	source activate cutadapt
 	cutadapt -g AACCGCCAGGAGT -m 50 -o ${name}.trimmed1.R1.fastq.gz -p ${name}.trimmed1.R2.fastq.gz $reads
 	"""
 }
@@ -59,7 +59,7 @@ process FIRST_ALIGN_BAM {
 	rg = "\"@RG\\tID:${name}\\tSM:${name}\\tLB:${name}\\tPL:ILLUMINA\""
 	"""
 	echo FIRST_ALIGN_BAM $name
-	source /home/anna/miniconda3/bin/activate bwa
+	source activate bwa
 	bwa mem -R ${rg} -t $task.cpus ${params.refindex} $reads > ${name}.sam
 	samtools view -Sb ${name}.sam -o ${name}.bam
 	"""
@@ -80,7 +80,7 @@ process SORT_INDEX {
 	script:
 	"""
 	echo SORT_INDEX $name
-	source /home/anna/miniconda3/bin/activate samtools
+	source activate samtools
 	samtools sort $bam -o ${name}.sorted.bam
 	samtools index ${name}.sorted.bam ${name}.sorted.bai
 	"""
@@ -99,7 +99,7 @@ process FLAGSTAT {
 	script:
 	"""
 	echo FLAGSTAT $name
-	source /home/anna/miniconda3/bin/activate bwa-samtools
+	source activate bwa-samtools
 	samtools flagstat $bam > ${name}.flagstat.txt
 	"""
 }
@@ -120,7 +120,7 @@ process DEDUP {
 	script:
 	"""
 	echo DEDUP $name
-	source /home/anna/miniconda3/bin/activate umi_tools
+	source activate umi_tools
 	umi_tools dedup -I $bam --paired -S ${name}.deduped.bam
 	samtools index ${name}.deduped.bam ${name}.deduped.bai
 	"""
@@ -141,11 +141,11 @@ process MUTECT2 {
 	script:
 	"""
 	echo MUTECT2 $name
-	source /home/anna/miniconda3/bin/activate gatk4
+	source activate gatk4
 	gatk Mutect2 --reference ${params.ref}.fa --input ${bam} --tumor-sample $name --annotation StrandArtifact --min-base-quality-score 20 --intervals $params.ivl --output ${sample.name}.mutect.vcf
 	"""
 }
-//source /home/anna/miniconda3/bin/activate gatk400
+//source activate gatk400
 
 process FILTER_MUTECT {
 	tag "FILTER_MUTECT on $name using $task.cpus CPUs and $task.memory memory"
@@ -161,7 +161,7 @@ process FILTER_MUTECT {
 	script:
 	"""
 	echo FILTER_MUTECT $name
-	source /home/anna/miniconda3/bin/activate gatk4
+	source activate gatk4
 	gatk FilterMutectCalls -V $vcf_input -O ${sample.name}.mutect.filt.vcf
 	"""
 }
@@ -181,7 +181,7 @@ process NORMALIZE_MUTECT {
 	script:
 	"""
 	echo NORMALIZE_MUTECT $name
-    source /home/anna/miniconda3/bin/activate bcftools117
+    source activate bcftools117
 	bcftools norm -m-both $vcf_input > ${sample.name}.mutect.filt.norm.vcf
 	"""
 }
@@ -201,7 +201,7 @@ process ANNOTATE_MUTECT {
 	script:
 	"""
 	echo ANNOTATE_MUTECT $name
-	source /home/anna/miniconda3/bin/activate  vep
+	source activate  vep
 	vep -i $vcf_input --cache --cache_version 95 --dir_cache $params.vep \
 	--fasta ${params.ref}.fa --merged --offline --vcf --everything -o ${sample.name}.mutect2.filt.norm.vep.vcf
 	"""	
@@ -223,7 +223,7 @@ process FILTER_VCF {
 	script:
 	"""
 	echo FILTER_VCF $name
-    source /home/anna/miniconda3/bin/activate bcftools117
+    source activate bcftools117
 	bcftools view -f 'PASS,clustered_events,multiallelic' $vcf_input > ${sample.name}.mutect2.filt.norm.vep.filt.vcf
 	"""	
 }
@@ -243,7 +243,7 @@ process VCF2CSV {
 	script:
 	"""
 	echo VCF2CSV $name
-	source /home/anna/miniconda3/bin/activate vcf2csv
+	source activate vcf2csv
 	python $params.vcf2csv simple --build GRCh37 -i $vcf_input -o ${name}.csv
 	"""	
 }
@@ -264,7 +264,7 @@ process MERGE_TABLES {
 	script:
 	"""
 	echo MERGE_TABLES $run
-	source /home/anna/miniconda3/bin/activate erko
+	source activate erko
 	Rscript --vanilla $params.mergescript $run
 	"""	
 }
@@ -285,7 +285,7 @@ process FLT3 {
 	script:
 	"""
 	echo FLT3 $name
-	source /home/anna/miniconda3/bin/activate perl
+	source activate perl
 	tar -C /tmp -xf $params.flt3tar
 	perl /tmp/FLT3/FLT3_ITD_ext/FLT3_ITD_ext.pl --bam $bam --output ./ --ngstype amplicon --genome hg19 --fgbiojar $params.fgbio --picardjar $params.picard --refindex /tmp/FLT3/FLT3_bwaindex/FLT3_dna_e1415
 	touch ${name}.deduped_FLT3_ITD_summary.txt
@@ -309,7 +309,7 @@ process BAMQC {
 	script:
 	"""
 	echo BAMQC $name
-    source /home/anna/miniconda3/bin/activate qc_picard_samtools
+    source activate qc_picard_samtools
 	samtools flagstat $bam > ${name}.flagstat
 	samtools stats $bam > ${name}.samstats
 	picard CollectHsMetrics I=$bam BAIT_INTERVALS=$params.ivl TARGET_INTERVALS=$params.ivl R=${params.ref}.fa O=${name}.hs_metrics
@@ -331,7 +331,7 @@ process COVERAGE {
 	script:
 	"""
 	echo COVERAGE $name
-	source /home/anna/miniconda3/bin/activate bedtools
+	source activate bedtools
 	bedtools coverage -abam $params.bed -b $bam -d > ${name}.PBcov.cons.txt
 	"""
 }
@@ -351,7 +351,7 @@ process COVERAGE_POSTPROCESS {
 	script:
 	"""
 	echo COVERAGE_POSTPROCESS $name
-	source /home/anna/miniconda3/bin/activate erko
+	source activate erko
 	Rscript --vanilla $params.covscript $txt
 	ls -al
 	"""
@@ -373,7 +373,7 @@ process MULTIQC {
 	script:
 	"""
 	echo MULTIQC $run
-	source /home/anna/miniconda3/bin/activate multiqc18
+	source activate multiqc18
 	multiqc . -n MultiQC.html
 	"""
 
@@ -412,7 +412,6 @@ workflow {
 	trimmedFQs = TRIMMING(umiFQs)
 	firstBAM = FIRST_ALIGN_BAM(trimmedFQs)
 	sortedBamBai = SORT_INDEX(firstBAM)
-	kontrolabam = FLAGSTAT(sortedBamBai)
 	dedupedBam = DEDUP(sortedBamBai)
 	QCs = BAMQC(dedupedBam)
 	ToMultiQC = QCs.map({return [it[1].run, it[2]]}).
