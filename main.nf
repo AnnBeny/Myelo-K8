@@ -3,9 +3,9 @@
 // # UMI 1-8 bases in read position
 process UMI_extract {
 	tag "UMI_extract on $name using $task.cpus CPUs and $task.memory memory"
-	//label "s_cpu"
-	//label "xxs_mem"
-	//container "quay.io/biocontainers/mulled-v2-452184f0fcbe6b0806405adb8f0b3873a7bd70a8:9c5efc89686d718e262836409bbf8541c6c5a159-0"
+	label "s_cpu"
+	label "xxs_mem"
+	container "quay.io/biocontainers/mulled-v2-452184f0fcbe6b0806405adb8f0b3873a7bd70a8:9c5efc89686d718e262836409bbf8541c6c5a159-0"
 
 	input:
 	tuple val(name), val(sample), path(fwd), path(rev)
@@ -26,8 +26,8 @@ process UMI_extract {
 
 process TRIMMING {
 	tag "TRIMMING on $name using $task.cpus CPUs and $task.memory memory"
-	//label "s_cpu"
-	//label "xxs_mem"
+	label "s_cpu"
+	label "xxs_mem"
 	
 	input:
 	tuple val(name), val(sample), path(reads)
@@ -46,8 +46,8 @@ process TRIMMING {
 
 process FIRST_ALIGN_BAM {
 	tag "FIRST_ALIGN_BAM on $name using $task.cpus CPUs and $task.memory memory"
-	//label "m_cpu"
-	//label "l_mem"
+	label "m_cpu"
+	label "l_mem"
 
 	input:
 	tuple val(name), val(sample), path(reads)
@@ -67,8 +67,8 @@ process FIRST_ALIGN_BAM {
 
 process SORT_INDEX {
 	tag "Sort index on $name using $task.cpus CPUs and $task.memory memory"
-	//label "m_mem"
-	//label "xs_cpu"
+	label "m_mem"
+	label "xs_cpu"
 
 	input:
 	tuple val(name), val(sample), path(bam)
@@ -108,8 +108,8 @@ process FLAGSTAT {
 process DEDUP {
 	tag "DEDUP on $name using $task.cpus CPUs and $task.memory memory"
 	publishDir "${params.outDirectory}/${sample.run}/mapped/", mode:'copy'
-	//label "s_cpu"
-	//label "m_mem"
+	label "s_cpu"
+	label "m_mem"
 
 	input:
 	tuple val(name), val(sample), path(bam), path(bai)
@@ -129,8 +129,8 @@ process DEDUP {
 process MUTECT2 {
 	tag "MUTECT2 on $name using $task.cpus CPUs and $task.memory memory"
 	publishDir "${params.outDirectory}/${sample.run}/vcfs/", mode:'copy'
-	//label "m_mem"
-	//label "s_cpu"
+	label "m_mem"
+	label "s_cpu"
 
 	input:
 	tuple val(name), val(sample), path(bam), path(bai)
@@ -149,8 +149,8 @@ process MUTECT2 {
 
 process FILTER_MUTECT {
 	tag "FILTER_MUTECT on $name using $task.cpus CPUs and $task.memory memory"
-	//label "s_mem"
-	//label "s_cpu"
+	label "s_mem"
+	label "s_cpu"
 
 	input:
 	tuple val(name), val(sample), path(vcf_input)
@@ -168,9 +168,9 @@ process FILTER_MUTECT {
 
 process NORMALIZE_MUTECT {
 	tag "NORMALIZE_MUTECT on $name using $task.cpus CPUs $task.memory"
-	//label "xxs_mem"
-	//label "s_cpu"
-	//container "staphb/bcftools:1.10.2"
+	label "xxs_mem"
+	label "s_cpu"
+	container "staphb/bcftools:1.10.2"
 
 	input:
 	tuple val(name), val(sample), path(vcf_input)
@@ -189,8 +189,8 @@ process NORMALIZE_MUTECT {
 process ANNOTATE_MUTECT {
 	tag "ANNOTATE_MUTECT on $name using $task.cpus CPUs $task.memory"
 	publishDir "${params.outDirectory}/${sample.run}/vcfs/", mode:'copy'
-	//label "s_mem"
-	//label "s_cpu"
+	label "s_mem"
+	label "s_cpu"
 
 	input:
 	tuple val(name), val(sample), path(vcf_input)
@@ -210,9 +210,9 @@ process ANNOTATE_MUTECT {
 process FILTER_VCF {
 	tag "FILTER_VCF on $name using $task.cpus CPUs $task.memory"
 	publishDir "${params.outDirectory}/${sample.run}/vcfs/", mode:'copy'
-	//container "staphb/bcftools:1.10.2"
-	//label "xxs_mem"
-	//label "s_cpu"
+	container "staphb/bcftools:1.10.2"
+	label "xxs_mem"
+	label "s_cpu"
 
 	input:
 	tuple val(name), val(sample), path(vcf_input)
@@ -231,8 +231,8 @@ process FILTER_VCF {
 process VCF2CSV {
 	tag "VCF2CSV on $name using $task.cpus CPUs $task.memory"
 	publishDir "${params.outDirectory}/${sample.run}/variants/", mode:'copy'
-	//label "xs_mem"
-	//label "s_cpu"
+	label "xs_mem"
+	label "s_cpu"
 
 	input:
 	tuple val(name), val(sample), path(vcf_input)
@@ -251,8 +251,8 @@ process VCF2CSV {
 process MERGE_TABLES {
 	tag "MERGE_TABLES on $run using $task.cpus CPUs $task.memory"
 	publishDir "${params.outDirectory}/${run}/variants/", mode:'copy'
-	//label "s_mem"
-	//label "s_cpu"
+	label "s_mem"
+	label "s_cpu"
 	debug true
 
 	input:
@@ -272,8 +272,8 @@ process MERGE_TABLES {
 process FLT3 {
 	tag "FLT3 on $name using $task.cpus CPUs $task.memory"
 	publishDir "${params.outDirectory}/${sample.run}/FLT3/", mode:'copy'
-	//label "m_mem"
-	//label "s_cpu"
+	label "m_mem"
+	label "s_cpu"
 	errorStrategy { task.exitStatus in [143,137,104,134,139,247,null,'', '-'] ? 'retry' : 'ignore' } //this does not really work
 
 	input:
@@ -296,9 +296,9 @@ process FLT3 {
 
 process BAMQC {
 	tag "BAMQC on $name using $task.cpus CPUs and $task.memory memory"
-	//label "s_mem"
-	//label "s_cpu"
-	//container 'quay.io/biocontainers/mulled-v2-b0664646864bfdb46c5343b1b2b93fc05adb4b77:39a005770a3e30fb6aa3bf424b57ddf52bae7ece-0'
+	label "s_mem"
+	label "s_cpu"
+	container 'quay.io/biocontainers/mulled-v2-b0664646864bfdb46c5343b1b2b93fc05adb4b77:39a005770a3e30fb6aa3bf424b57ddf52bae7ece-0'
 
 	input:
 	tuple val(name), val(sample), path(bam), path(bai)
@@ -319,8 +319,8 @@ process BAMQC {
 
 process COVERAGE {
 	tag "COVERAGE on $name using $task.cpus CPUs and $task.memory memory"
-	//label "xl_mem"
-	//label "s_cpu"
+	label "xl_mem"
+	label "s_cpu"
 
 	input:
 	tuple val(name), val(sample), path(bam), path(bai)
@@ -339,8 +339,8 @@ process COVERAGE {
 process COVERAGE_POSTPROCESS {
 	tag "COVERAGE_POSTPROCESS on $name using $task.cpus CPUs and $task.memory memory"
 	publishDir "${params.outDirectory}/${sample.run}/Cov/", mode:'copy'
-	//label "s_mem"
-	//label "xxs_mem"
+	label "s_mem"
+	label "xxs_mem"
 
 	input:
 	tuple val(name), val(sample), path(txt)
@@ -360,9 +360,9 @@ process COVERAGE_POSTPROCESS {
 process MULTIQC {
 	tag "MultiQC on all samples from $run using $task.cpus CPUs and $task.memory memory"
 	publishDir "${params.outDirectory}/${run}/QC/", mode:'copy'
-	//container 'ewels/multiqc:v1.18'
-	//label "xs_mem"
-	//label "s_cpu"
+	container 'ewels/multiqc:v1.18'
+	label "xs_mem"
+	label "s_cpu"
 
 	input:
 	tuple val(run), path(all_annotated_normed)
