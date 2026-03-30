@@ -371,7 +371,6 @@ process MULTIQC {
 	script:
 	"""
 	echo MULTIQC $run
-	source activate multiqc18
 	multiqc . -n MultiQC.html
 	"""
 
